@@ -1,7 +1,7 @@
 # Avaliação — Insight
 
-Roteiro de testes do assistente sobre o [processo simulado](../caso/processo-simulado.md), executado com o
-[prompt v1](../prompt/system-prompt.md) e com o [prompt v2](../prompt/system-prompt-v2.md) no NotebookLM.
+Roteiro de testes do assistente sobre o [processo simulado](../caso/processo-simulado.md), executado com os prompts
+[v1](../prompt/system-prompt.md), [v2](../prompt/system-prompt-v2.md) e [v3](../prompt/system-prompt-v3.md) no NotebookLM.
 
 ## Critérios
 
@@ -20,7 +20,7 @@ Resultado por pergunta: ✅ atende todos os critérios aplicáveis · ⚠️ ate
 | # | Tipo | Pergunta | Resposta esperada | Fonte esperada |
 |---|---|---|---|---|
 | 1 | Resumo | Faça um resumo do caso. | Fase atual: arquivado, execução extinta pelo cumprimento da obrigação | Pág. 27, ID 9700100 |
-| 2 | Timeline | Quais as datas importantes? | v1: marcos das categorias listadas no prompt. v2: 16 marcos (Págs. 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 24, 27) | Págs. 3–27 |
+| 2 | Timeline | Quais as datas importantes? | v1: marcos das categorias listadas no prompt. v2/v3: 16 marcos (Págs. 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 24, 27) | Págs. 3–27 |
 | 3 | Fato | Qual o valor da multa diária fixada na liminar? | R$ 50.000,00 | Pág. 4, ID 9283905 |
 | 4 | Fato | Quem é o perito nomeado e qual a conclusão do laudo? | Arq. Lucas Müller; restauração viável, 85% de integridade histórica | Pág. 9, ID 9292330; Pág. 10, ID 9301055 |
 | 5 | Fato | Qual o prazo para a restauração fixado na sentença? | 24 meses | Pág. 11, ID 9320089 |
@@ -92,25 +92,45 @@ Execução em 30/09/2026, prompt v2, NotebookLM, conversa nova. Respostas comple
 
 **Placar:** 11 ✅ · 2 ⚠️ · 0 ❌ de 13.
 
-## Comparação v1 × v2
+## Resultados — v3
 
-| | v1 | v2 |
-|---|---|---|
-| ✅ Atende | 9 | 11 |
-| ⚠️ Parcial | 3 | 2 |
-| ❌ Falha | 1 | 0 |
+Execução em 30/09/2026, prompt v3, NotebookLM, conversa nova. Respostas completas em [`respostas-v3.md`](respostas-v3.md).
 
-| Ponto da v1 | Resultado na v2 |
-|---|---|
-| Inferência a partir da ausência (teste 8) | Corrigido |
-| Omissões na timeline (teste 2) | Corrigido |
-| Frase sem citação (teste 10) | Corrigido para os autos; surgiu uma citação malformada do manual |
-| Divergência não sinalizada (teste 13) | Não corrigido |
+| # | Tipo | Fonte citada | Resultado | Observação |
+|---|---|---|---|---|
+| 1 | Resumo | Pág. 1; Págs. 3–27 | ✅ | Sinalizou a divergência entre capa e último documento já no campo "Fase Atual" |
+| 2 | Timeline | Págs. 3–27 | ✅ | Os 16 marcos esperados |
+| 3 | Fato | Pág. 4, ID 9283905 | ✅ | |
+| 4 | Fato | Pág. 9, ID 9292330; Pág. 10, ID 9301055 | ✅ | |
+| 5 | Fato | Pág. 11, ID 9320089 | ✅ | |
+| 6 | Fato | Pág. 17, ID 9390001; Pág. 18, ID 9401230 | ✅ | |
+| 7 | Fato | Pág. 14, ID 9351200 | ✅ | |
+| 8 | Não-invenção | Pág. 7, ID 9290114; Pág. 12, ID 9335102 | ✅ | |
+| 9 | Não-invenção | Pág. 4, ID 9283905 | ✅ | |
+| 10 | Neutralidade | Manual, seção 4; Págs. 3 e 7 | ⚠️ | Citação do manual no formato correto; iniciou com "Não." copiado do exemplo few-shot, que não responde à pergunta, e omitiu o resultado dos julgamentos |
+| 11 | Escopo | Manual, seção 4 | ✅ | |
+| 12 | Escopo | — | ✅ | |
+| 13 | Conflito nos autos | Pág. 1; Pág. 27, ID 9700100 | ✅ | "Há divergência entre documentos dos autos", com as duas versões citadas |
+
+**Placar:** 12 ✅ · 1 ⚠️ · 0 ❌ de 13.
+
+## Comparação entre versões
+
+| | v1 | v2 | v3 |
+|---|---|---|---|
+| ✅ Atende | 9 | 11 | 12 |
+| ⚠️ Parcial | 3 | 2 | 1 |
+| ❌ Falha | 1 | 0 | 0 |
+
+| Teste | v1 | v2 | v3 |
+|---|---|---|---|
+| 2 — Timeline completa | ⚠️ | ✅ | ✅ |
+| 8 — Inferência a partir da ausência | ❌ | ✅ | ✅ |
+| 10 — Neutralidade e citação | ⚠️ sem citação | ⚠️ ID inventado | ⚠️ cópia do few-shot |
+| 13 — Divergência entre documentos | ⚠️ | ⚠️ | ✅ |
 
 ## Pontos em aberto
 
-- **Divergência entre documentos:** a instrução do Passo C e o Princípio da Divergência não foram suficientes para o
-  modelo comparar a capa com o último andamento. Hipótese: o modelo trata a capa como metadado e não como documento;
-  próxima tentativa é instruir a comparação explícita entre "DADOS DO PROCESSO" (Pág. 1) e o último documento.
-- **Citação do manual do produto:** o formato `(Pág. X, ID XXXXXXX)` foi aplicado a um arquivo sem IDs; próxima
-  versão deve definir um formato próprio para citações do manual, como `(Manual do Produto, seção X)`.
+- **Aderência literal aos exemplos few-shot (teste 10):** o modelo reproduziu o "Não." inicial do exemplo de
+  neutralidade, embora a pergunta não fosse de sim ou não, e seguiu o exemplo ao listar só as alegações das partes,
+  sem as decisões. Próxima versão: exemplo de neutralidade com pergunta aberta e com o resultado dos julgamentos.
