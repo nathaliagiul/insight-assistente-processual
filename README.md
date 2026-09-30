@@ -31,16 +31,16 @@ Regras que valem para todas as funções:
 
 ## Arquitetura do prompt
 
-O prompt do sistema está na versão [v2](prompt/system-prompt-v2.md), revisada a partir da avaliação da
-[v1](prompt/system-prompt.md). É organizado em sete blocos:
+O prompt do sistema está na versão [v3](prompt/system-prompt-v3.md), resultado de duas rodadas de avaliação
+([v1](prompt/system-prompt.md) → [v2](prompt/system-prompt-v2.md) → v3). É organizado em sete blocos:
 
 | Bloco | Técnica |
 |---|---|
 | Persona | Identidade fixa, tom formal |
 | Missão e escopo | Separação entre fonte de regras (manual do produto) e fonte de fatos (autos) |
 | Raciocínio | Chain of Thought em 5 passos: intenção → busca → verificação → resposta → neutralidade |
-| Restrições | Não-invenção, não-inferência (ausência de registro não é fato), tratamento de divergências, redirecionamento fora do escopo |
-| Exemplos | Few-shot para resumo, timeline, informação inexistente, divergência e pergunta fora do escopo |
+| Restrições | Não-invenção, não-inferência (ausência de registro não é fato), divergência entre documentos, fonte correta de citação, redirecionamento fora do escopo |
+| Exemplos | Few-shot para resumo, timeline, informação inexistente, divergência, neutralidade e pergunta fora do escopo |
 | Saída | Contrato de formato: títulos e padrão de citação |
 | Rastreabilidade | Ancoragem na paginação impressa no rodapé do PDF, não na paginação interna da ferramenta |
 
@@ -54,11 +54,13 @@ para calibrar.
 insight-assistente-processual/
 ├── docs/visao-produto.md             # visão, persona, jornadas, funcionalidades, roadmap, FAQ
 ├── prompt/system-prompt.md           # configuração do assistente (v1)
-├── prompt/system-prompt-v2.md        # configuração revisada após a avaliação (v2)
+├── prompt/system-prompt-v2.md        # revisão após a avaliação da v1
+├── prompt/system-prompt-v3.md        # revisão após a avaliação da v2 (atual)
 ├── caso/processo-simulado.md         # autos fictícios de uma Ação Civil Pública (27 páginas)
 ├── avaliacao/perguntas-e-respostas.md  # casos de teste, resultados, comparação e pontos em aberto
 ├── avaliacao/respostas-v1.md           # respostas com o prompt v1, sem edição
-└── avaliacao/respostas-v2.md           # respostas com o prompt v2, sem edição
+├── avaliacao/respostas-v2.md           # respostas com o prompt v2, sem edição
+└── avaliacao/respostas-v3.md           # respostas com o prompt v3, sem edição
 ```
 
 ## Estudo de caso
@@ -73,22 +75,22 @@ cumprimento de sentença. O processo percorre primeiro e segundo grau e contém 
 O [roteiro de avaliação](avaliacao/perguntas-e-respostas.md) tem 13 casos de teste cobrindo fidelidade,
 rastreabilidade, não-invenção, neutralidade, escopo e conflito de informação nos autos.
 
-| Resultado | v1 | v2 |
+| Resultado | v1 | v2 | v3 |
+|---|---|---|---|
+| ✅ Atende | 9 | 11 | 12 |
+| ⚠️ Parcial | 3 | 2 | 1 |
+| ❌ Falha | 1 | 0 | 0 |
+
+Em todas as versões, as citações de página e ID dos autos apontaram o documento correto e os testes de escopo
+passaram.
+
+| Versão | Mudança | Efeito |
 |---|---|---|
-| ✅ Atende | 9 | 11 |
-| ⚠️ Parcial | 3 | 2 |
-| ❌ Falha | 1 | 0 |
+| v1 → v2 | Princípio de que ausência de registro não é fato; timeline classificada pelo conteúdo do documento; citação em cada frase | Eliminou a única falha (o modelo concluía "não houve pagamento" sobre uma indenização inexistente) e as omissões da timeline |
+| v2 → v3 | Capa do processo tratada como documento, com comparação obrigatória da situação; formato próprio para citar o manual | Passou a sinalizar a divergência entre capa e último andamento e parou de inventar IDs |
 
-Nas duas versões, todas as citações de página e ID dos autos apontaram o documento correto, e os testes de escopo e
-neutralidade passaram.
-
-A v1 falhou em uma pergunta sobre informação inexistente (valor de indenização): concluiu que "não houve pagamento" em
-vez de declarar que a informação não consta dos autos. A v2 introduziu o princípio de que ausência de registro não é
-fato, a classificação da timeline pelo conteúdo do documento e a exigência de citação em cada frase, corrigindo a falha
-e as omissões da timeline.
-
-Em aberto na v2: o modelo ainda não sinaliza a divergência entre a capa e o último andamento, e citou o manual do
-produto com um ID inexistente. Detalhes em [pontos em aberto](avaliacao/perguntas-e-respostas.md#pontos-em-aberto).
+Em aberto na v3: no teste de neutralidade, o modelo copiou literalmente o início do exemplo few-shot. Detalhes em
+[pontos em aberto](avaliacao/perguntas-e-respostas.md#pontos-em-aberto).
 
 ## Como reproduzir
 
@@ -97,7 +99,7 @@ produto com um ID inexistente. Detalhes em [pontos em aberto](avaliacao/pergunta
 2. Exporte [`docs/visao-produto.md`](docs/visao-produto.md) para PDF como `1_Insight.pdf`.
 3. Crie um notebook no [NotebookLM](https://notebooklm.google.com) e carregue os dois PDFs como fontes.
 4. Nas configurações da conversa do notebook, use o modo personalizado e cole o conteúdo do bloco de texto de
-   [`prompt/system-prompt-v2.md`](prompt/system-prompt-v2.md).
+   [`prompt/system-prompt-v3.md`](prompt/system-prompt-v3.md).
 5. Execute as perguntas de [`avaliacao/perguntas-e-respostas.md`](avaliacao/perguntas-e-respostas.md).
 
 ## Limitações
