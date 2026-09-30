@@ -43,9 +43,9 @@ O [prompt do sistema](prompt/system-prompt.md) é organizado em sete blocos:
 | Saída | Contrato de formato: títulos e padrão de citação |
 | Rastreabilidade | Ancoragem na paginação impressa no rodapé do PDF, não na paginação interna da ferramenta |
 
-O último bloco resolve um problema observado no desenvolvimento: o NotebookLM numera as páginas do PDF pela sua
-própria contagem, que não coincide com a numeração dos autos. O prompt instrui o modelo a ler o número do rodapé e
-fornece âncoras textuais (título da página → número esperado) para calibrar.
+O último bloco trata a divergência entre a contagem de páginas da ferramenta e a numeração dos autos: o prompt
+instrui o modelo a usar o número impresso no rodapé e fornece âncoras textuais (título da página → número esperado)
+para calibrar.
 
 ## Estrutura do repositório
 
@@ -54,7 +54,8 @@ insight-assistente-processual/
 ├── docs/visao-produto.md             # visão, persona, jornadas, funcionalidades, roadmap, FAQ
 ├── prompt/system-prompt.md           # configuração do assistente (v1)
 ├── caso/processo-simulado.md         # autos fictícios de uma Ação Civil Pública (27 páginas)
-└── avaliacao/perguntas-e-respostas.md  # casos de teste e resultados
+├── avaliacao/perguntas-e-respostas.md  # casos de teste, resultados e conclusões
+└── avaliacao/respostas-v1.md           # respostas do assistente, sem edição
 ```
 
 ## Estudo de caso
@@ -69,13 +70,24 @@ cumprimento de sentença. O processo percorre primeiro e segundo grau e contém 
 O [roteiro de avaliação](avaliacao/perguntas-e-respostas.md) tem 13 casos de teste cobrindo fidelidade,
 rastreabilidade, não-invenção, neutralidade, escopo e conflito de informação nos autos.
 
+| Resultado v1 | Casos |
+|---|---|
+| ✅ Atende | 9 |
+| ⚠️ Parcial | 3 |
+| ❌ Falha | 1 |
+
+Todas as citações de página e ID apontaram o documento correto, e os testes de escopo e neutralidade passaram. A falha
+ocorreu em uma pergunta sobre informação inexistente (valor de indenização): o modelo concluiu que "não houve
+pagamento" em vez de declarar que a informação não consta dos autos. Os pontos parciais foram omissões na timeline,
+uma afirmação sem citação e a ausência de alerta sobre uma divergência entre documentos.
+
 ## Como reproduzir
 
 1. Exporte [`caso/processo-simulado.md`](caso/processo-simulado.md) para PDF como `2_Processo.pdf`, com uma página por
    documento e o número da página impresso no rodapé (`Página X`).
 2. Exporte [`docs/visao-produto.md`](docs/visao-produto.md) para PDF como `1_Insight.pdf`.
 3. Crie um notebook no [NotebookLM](https://notebooklm.google.com) e carregue os dois PDFs como fontes.
-4. Em **Configurar conversa → Personalizado**, cole o conteúdo do bloco de texto de
+4. Nas configurações da conversa do notebook, use o modo personalizado e cole o conteúdo do bloco de texto de
    [`prompt/system-prompt.md`](prompt/system-prompt.md).
 5. Execute as perguntas de [`avaliacao/perguntas-e-respostas.md`](avaliacao/perguntas-e-respostas.md).
 
