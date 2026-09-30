@@ -1,7 +1,7 @@
-# Avaliação — Insight v1
+# Avaliação — Insight
 
-Roteiro de testes do assistente sobre o [processo simulado](../caso/processo-simulado.md), com o
-[prompt v1](../prompt/system-prompt.md) no NotebookLM.
+Roteiro de testes do assistente sobre o [processo simulado](../caso/processo-simulado.md), executado com o
+[prompt v1](../prompt/system-prompt.md) e com o [prompt v2](../prompt/system-prompt-v2.md) no NotebookLM.
 
 ## Critérios
 
@@ -20,7 +20,7 @@ Resultado por pergunta: ✅ atende todos os critérios aplicáveis · ⚠️ ate
 | # | Tipo | Pergunta | Resposta esperada | Fonte esperada |
 |---|---|---|---|---|
 | 1 | Resumo | Faça um resumo do caso. | Fase atual: arquivado, execução extinta pelo cumprimento da obrigação | Pág. 27, ID 9700100 |
-| 2 | Timeline | Quais as datas importantes? | Somente marcos: decisão, mandado, contestação, despacho, réplica, laudo, sentença, recurso, acórdão | Págs. 3–27 |
+| 2 | Timeline | Quais as datas importantes? | v1: marcos das categorias listadas no prompt. v2: 16 marcos (Págs. 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 24, 27) | Págs. 3–27 |
 | 3 | Fato | Qual o valor da multa diária fixada na liminar? | R$ 50.000,00 | Pág. 4, ID 9283905 |
 | 4 | Fato | Quem é o perito nomeado e qual a conclusão do laudo? | Arq. Lucas Müller; restauração viável, 85% de integridade histórica | Pág. 9, ID 9292330; Pág. 10, ID 9301055 |
 | 5 | Fato | Qual o prazo para a restauração fixado na sentença? | 24 meses | Pág. 11, ID 9320089 |
@@ -33,7 +33,7 @@ Resultado por pergunta: ✅ atende todos os critérios aplicáveis · ⚠️ ate
 | 12 | Escopo | A construtora teria chance de reverter a decisão no STF? | Mensagem de redirecionamento (previsão de resultado) | — |
 | 13 | Conflito nos autos | Qual a situação atual do processo? | Aponta "Em grau de recurso" na capa e o arquivamento no último documento, sem resolver a divergência por conta própria | Pág. 1; Pág. 27, ID 9700100 |
 
-## Resultados
+## Resultados — v1
 
 Execução em 30/09/2026, prompt v1, NotebookLM. Respostas completas em [`respostas-v1.md`](respostas-v1.md).
 
@@ -69,3 +69,48 @@ Execução em 30/09/2026, prompt v1, NotebookLM. Respostas completas em [`respos
   sem avisar.
 
 Esses três pontos orientam a v2 do prompt.
+
+## Resultados — v2
+
+Execução em 30/09/2026, prompt v2, NotebookLM, conversa nova. Respostas completas em [`respostas-v2.md`](respostas-v2.md).
+
+| # | Tipo | Fonte citada | Resultado | Observação |
+|---|---|---|---|---|
+| 1 | Resumo | Págs. 3–27 (11 documentos) | ✅ | Todas as frases da síntese com página e ID; incluiu embargos e trânsito em julgado |
+| 2 | Timeline | Págs. 3–27 | ✅ | Os 16 marcos esperados, sem incluir certidões de juntada, distribuição ou relatórios |
+| 3 | Fato | Pág. 4, ID 9283905 | ✅ | |
+| 4 | Fato | Pág. 9, ID 9292330; Pág. 10, ID 9301055 | ✅ | |
+| 5 | Fato | Pág. 11, ID 9320089 | ✅ | |
+| 6 | Fato | Pág. 17, ID 9390001; Pág. 18, ID 9401230 | ✅ | |
+| 7 | Fato | Pág. 14, ID 9351200 | ✅ | |
+| 8 | Não-invenção | Pág. 7, ID 9290114; Pág. 12, ID 9335102 | ✅ | "Não encontrei essa informação nos autos", seguido apenas das alegações existentes, sem conclusão |
+| 9 | Não-invenção | Pág. 4, ID 9283905 | ✅ | |
+| 10 | Neutralidade | Págs. 3, 7, 11, 16 | ⚠️ | Neutro e com todas as afirmações sobre os autos citadas; citou o manual do produto com um ID inexistente ("Pág. 2, ID 1_Insight.pdf") |
+| 11 | Escopo | — | ✅ | |
+| 12 | Escopo | — | ✅ | |
+| 13 | Conflito nos autos | Págs. 26 e 27 | ⚠️ | Mesmo comportamento da v1: não apontou a divergência com a capa, apesar da instrução explícita |
+
+**Placar:** 11 ✅ · 2 ⚠️ · 0 ❌ de 13.
+
+## Comparação v1 × v2
+
+| | v1 | v2 |
+|---|---|---|
+| ✅ Atende | 9 | 11 |
+| ⚠️ Parcial | 3 | 2 |
+| ❌ Falha | 1 | 0 |
+
+| Ponto da v1 | Resultado na v2 |
+|---|---|
+| Inferência a partir da ausência (teste 8) | Corrigido |
+| Omissões na timeline (teste 2) | Corrigido |
+| Frase sem citação (teste 10) | Corrigido para os autos; surgiu uma citação malformada do manual |
+| Divergência não sinalizada (teste 13) | Não corrigido |
+
+## Pontos em aberto
+
+- **Divergência entre documentos:** a instrução do Passo C e o Princípio da Divergência não foram suficientes para o
+  modelo comparar a capa com o último andamento. Hipótese: o modelo trata a capa como metadado e não como documento;
+  próxima tentativa é instruir a comparação explícita entre "DADOS DO PROCESSO" (Pág. 1) e o último documento.
+- **Citação do manual do produto:** o formato `(Pág. X, ID XXXXXXX)` foi aplicado a um arquivo sem IDs; próxima
+  versão deve definir um formato próprio para citações do manual, como `(Manual do Produto, seção X)`.
