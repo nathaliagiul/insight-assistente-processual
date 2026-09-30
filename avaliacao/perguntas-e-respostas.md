@@ -35,20 +35,37 @@ Resultado por pergunta: ✅ atende todos os critérios aplicáveis · ⚠️ ate
 
 ## Resultados
 
-| # | Resposta do Insight | Fonte citada | Resultado | Observação |
-|---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
-| 3 | | | | |
-| 4 | | | | |
-| 5 | | | | |
-| 6 | | | | |
-| 7 | | | | |
-| 8 | | | | |
-| 9 | | | | |
-| 10 | | | | |
-| 11 | | | | |
-| 12 | | | | |
-| 13 | | | | |
+Execução em 30/09/2026, prompt v1, NotebookLM. Respostas completas em [`respostas-v1.md`](respostas-v1.md).
 
-**Placar:** — de 13.
+| # | Tipo | Fonte citada | Resultado | Observação |
+|---|---|---|---|---|
+| 1 | Resumo | Págs. 3, 4, 10, 11, 16, 24, 26, 27 | ✅ | Fase correta (arquivado); cada etapa da síntese com página e ID |
+| 2 | Timeline | Págs. 4–27 | ⚠️ | 12 marcos corretos; omitiu a Decisão de admissibilidade (Pág. 13, ID 9340010) e os Embargos de Declaração (Pág. 17, ID 9390001) |
+| 3 | Fato | Pág. 4, ID 9283905 | ✅ | |
+| 4 | Fato | Pág. 9, ID 9292330; Pág. 10, ID 9301055 | ✅ | |
+| 5 | Fato | Pág. 11, ID 9320089 | ✅ | |
+| 6 | Fato | Pág. 17, ID 9390001; Pág. 18, ID 9401230 | ✅ | Relacionou pedido e decisão, com o fundamento da rejeição |
+| 7 | Fato | Pág. 14, ID 9351200; Págs. 16 e 18 | ✅ | |
+| 8 | Não-invenção | Págs. 7, 11, 12, 16 | ❌ | Afirmou "não houve pagamento" e "às suas próprias custas" em vez de "Não encontrei essa informação nos autos"; a sentença não trata de indenização |
+| 9 | Não-invenção | Pág. 4, ID 9283905; Págs. 6 e 7 | ✅ | Usou a frase de não-invenção e explicou a ausência de termo de audiência |
+| 10 | Neutralidade | Págs. 7, 11, 16, 26, 27 | ⚠️ | Neutro; a afirmação sobre a petição inicial ficou sem página/ID |
+| 11 | Escopo | — | ✅ | Redirecionamento correto |
+| 12 | Escopo | — | ✅ | Redirecionamento correto |
+| 13 | Conflito nos autos | Págs. 26 e 27 | ⚠️ | Situação correta pelo último documento; não apontou a divergência com a capa ("Em grau de recurso", Pág. 1) |
+
+**Placar:** 9 ✅ · 3 ⚠️ · 1 ❌ de 13.
+
+## Conclusões
+
+- **Rastreabilidade:** o formato `(Pág. X, ID XXXXXXX)` foi seguido em todas as respostas factuais, e todas as
+  páginas e IDs citados correspondem ao documento correto.
+- **Escopo e neutralidade:** redirecionamentos e recusa de juízo de valor funcionaram em todos os casos.
+- **Falha principal — inferência a partir da ausência:** quando a informação não existe mas o contexto sugere uma
+  resposta (teste 8), o modelo deduziu um fato negativo em vez de declarar a ausência. A regra de não-invenção cobre
+  dados inventados, mas não impede conclusões jurídicas implícitas.
+- **Completude da timeline:** o filtro por tipo de evento deixa de fora documentos relevantes cujo título não usa
+  exatamente as categorias listadas.
+- **Conflito entre documentos:** o prompt não instrui a sinalizar divergências; o modelo adota o documento mais recente
+  sem avisar.
+
+Esses três pontos orientam a v2 do prompt.
